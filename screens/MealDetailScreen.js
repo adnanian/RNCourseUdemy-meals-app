@@ -48,7 +48,7 @@ export default function MealDetailScreen({ route, navigation }) {
 
 const styles = StyleSheet.create({
     rootContainer: {
-        marginBottom: 32
+        marginBottom: 60
     },
     image: {
         width: '100%',
