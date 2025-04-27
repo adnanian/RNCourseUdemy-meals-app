@@ -3,24 +3,37 @@ import { MEALS } from "../data/dummy-data";
 import MealDetails from "../components/MealDetails";
 import Subtitle from "../components/MealDetail/Subtitle";
 import List from "../components/MealDetail/List";
-import { useLayoutEffect } from "react";
+import { useContext, useLayoutEffect, useCallback } from "react";
 import IconButton from "../components/IconButton";
+import { FavoritesContext } from "../store/context/favorites-context";
 
 export default function MealDetailScreen({ route, navigation }) {
+    const favoriteMealsCtx = useContext(FavoritesContext);
     const mealId = route.params.mealId;
     const selectedMeal = MEALS.find((meal) => meal.id === mealId);
 
-    function headerButtonPressHandler() {
-        console.log("PRESSED!");
+    const mealIsFavorite = favoriteMealsCtx.ids.includes(mealId);
+
+    function changeFavoriteStatusHandler() {
+        if (mealIsFavorite) {
+            favoriteMealsCtx.removeFavorite(mealId);
+        } else {
+            favoriteMealsCtx.addFavorite(mealId);
+        }
     }
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            headerRight: () => {
-                return <IconButton icon='star' color='white' onPress={headerButtonPressHandler} />
-            }
+            headerRight: () => (
+                <IconButton
+                    icon={mealIsFavorite ? 'star' : 'star-outline'}
+                    color="white"
+                    onPress={changeFavoriteStatusHandler}
+                />
+            ),
         });
-    }, [navigation, headerButtonPressHandler]);
+    }, [navigation, mealIsFavorite, favoriteMealsCtx.ids, changeFavoriteStatusHandler]);
+
 
     return (
         <ScrollView style={styles.rootContainer}>
@@ -38,7 +51,7 @@ export default function MealDetailScreen({ route, navigation }) {
                 <View style={styles.listContainer}>
                     <Subtitle>Ingredients</Subtitle>
                     <List data={selectedMeal.ingredients} />
-                    <Subtitle>Text</Subtitle>
+                    <Subtitle>Steps</Subtitle>
                     <List data={selectedMeal.steps} />
                 </View>
             </View>
